@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/asperatusx/tinyapp/issues"
   },
-  "homepage": "https://github.com/asperatusx/tinyapp#readme"
+  "homepage": "https://github.com/asperatusx/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
 }

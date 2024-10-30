@@ -1,5 +1,6 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const morgan = require('morgan');
 const app = express();
 const PORT = 8080; //default 8080
 
@@ -8,8 +9,22 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com",
 }
 
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "a@a.com",
+    password: "1234",
+  },
+  user2RandomID: {
+    id: "user2RandomID",
+    email: "b@b.com",
+    password: "5678",
+  },
+}
+
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
 app.use(cookieParser());
 
 function generateRandomString() {
@@ -88,9 +103,34 @@ app.get('/register', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-  if (!req.body.email || !req.body.password) {
+
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // if email or password not sent
+  if (!email || !password) {
     return res.status(404).send('Please enter an email and password')
   }
+
+  // if email already exist
+  for (userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      return res.status(400).send('email already in use')
+    }
+  }
+
+  const id = generateRandomString();
+  const newUser = {
+    id: id,
+    email: email,
+    password: password
+  }
+
+  users[id] = newUser;
+  console.log(users)
+  res.cookie('user_id', id);
+  res.redirect('/urls');
 })
 
 app.listen(PORT, () => {

@@ -22,7 +22,7 @@
         <label for="longURL" style="font-weight: bold; color: blue;">EDIT</label>
         <form action="/urls/<%= id %>" method="POST">
           <label for="longURL">Enter new URL:</label>
-          <input type="text" name="longURL" placeholder="http://">
+          <input type="text" name="longURL" value="<%= longURL %>">
           <button type="submit">Update</button>
         </form>
       </div>

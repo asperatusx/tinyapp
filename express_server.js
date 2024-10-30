@@ -38,25 +38,35 @@ app.get('/', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
+  const cookieId = req.cookies['user_id']
+  const user = users[cookieId]
+  console.log('result of cookieId: ', cookieId)
+
   const templateVars = {
     urls: urlDatabase,
-    username: req.cookies['username']
+    user: user
   };
+  console.log('result of templateVars:', templateVars);
   res.render('urls_index', templateVars);
 })
 
-// Go to create new URL page
+// Go to create new URL page   USERNAME
 app.get('/urls/new', (req, res) => {
-  const templateVars = {username: req.cookies['username']}
+  const cookieId = req.cookies['user_id'];
+  const user = users[cookieId];
+  const templateVars = {user: user }
   res.render('urls_new', templateVars);
 })
 
 // Go to specific URL in database
 app.get('/urls/:id', (req, res) => {
+  const cookieId = req.cookies['user_id']
+  const user = users[cookieId];
+  
   const templateVars = {
     id: req.params.id,
     longURL: urlDatabase[req.params.id],
-    username: req.cookies['username']
+    user: user
   }
   res.render('urls_show', templateVars);
 })
@@ -87,11 +97,12 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 })
 
+// username
 app.post('/login', (req, res) => {
-  res.cookie('username', req.body.username);
   res.redirect('/urls');
 })
 
+//username
 app.post('/logout', (req, res) => {
   res.clearCookie('username');
   res.redirect('/urls');

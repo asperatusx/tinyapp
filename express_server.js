@@ -43,7 +43,7 @@ app.get('/u/:id', (req, res) => {
 app.post('/urls', (req, res) => {
   const newId = generateRandomString();
   urlDatabase[newId] = req.body.longURL;
-  res.redirect(`urls/${newId}`);
+  res.redirect(`/urls/${newId}`);
 })
 
 

@@ -25,10 +25,12 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 })
 
+// Go to create new URL page
 app.get('/urls/new', (req, res) => {
   res.render('urls_new');
 })
 
+// Go to specific URL in database
 app.get('/urls/:id', (req, res) => {
   const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id]}
   res.render('urls_show', templateVars);
@@ -40,10 +42,19 @@ app.get('/u/:id', (req, res) => {
   res.redirect(longURL);
 })
 
+// create new url
 app.post('/urls', (req, res) => {
   const newId = generateRandomString();
   urlDatabase[newId] = req.body.longURL;
   res.redirect(`/urls/${newId}`);
+})
+
+// edit the url
+app.post('/urls/:id', (req, res) => {
+  const id = req.params.id;
+  console.log(req.params);
+  urlDatabase[id] = req.body.longURL;
+  res.redirect('/urls');
 })
 
 app.post('/urls/:id/delete', (req, res) => {

@@ -82,10 +82,11 @@ app.post('/logout', (req, res) => {
   res.redirect('/urls');
 })
 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-  console.log('hello')
-});
+// register user
+app.get('/register', (req, res) => {
+  res.render('register');
+})
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

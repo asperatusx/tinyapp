@@ -87,6 +87,11 @@ app.get('/register', (req, res) => {
   res.render('register');
 })
 
+app.post('/register', (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(404).send('Please enter an email and password')
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

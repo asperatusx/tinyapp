@@ -46,9 +46,16 @@ app.post('/urls', (req, res) => {
   res.redirect(`/urls/${newId}`);
 })
 
+app.post('/urls/:id/delete', (req, res) => {
+  const id = req.params.id;
+  delete urlDatabase[id];
+  console.log(urlDatabase)
+  res.redirect('/urls');
+})
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+  console.log('hello')
 });
 
 app.listen(PORT, () => {

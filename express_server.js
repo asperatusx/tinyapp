@@ -120,7 +120,7 @@ app.post('/register', (req, res) => {
 
   // if email or password not sent
   if (!email || !password) {
-    return res.status(404).send('Please enter an email and password')
+    return res.status(400).send('Please enter an email and password')
   }
 
   // if email already exist

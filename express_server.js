@@ -10,6 +10,12 @@ const urlDatabase = {
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
+function generateRandomString() {
+  const randomNum = Math.random().toString(36).substring(2,8);
+  return randomNum;
+}
+
+
 app.get('/', (req, res) => {
   res.end('Hello!');
 });

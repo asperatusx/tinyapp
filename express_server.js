@@ -124,12 +124,8 @@ app.post('/register', (req, res) => {
   }
 
   // if email already exist
-  for (userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      return res.status(400).send('email already in use')
-    }
-  }
+  const foundUser = getUserByEmail(users, email);
+  if (foundUser) return res.status(400).send('Email already in use. Please use another.')
 
   const id = generateRandomString();
   const newUser = {
@@ -143,6 +139,15 @@ app.post('/register', (req, res) => {
   res.cookie('user_id', id);
   res.redirect('/urls');
 })
+
+const getUserByEmail = function(users, email) {
+  for (userId in users) {
+    const user = users[userId];
+    if (user.email === email) {
+      return user
+    }
+  }
+}
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

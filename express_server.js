@@ -62,7 +62,6 @@ function urlsForUser(id) {
       urlObj[dataId] = {longURL: urlDatabase[dataId].longURL};
     }
   }
-  console.log('urlObj is -----------', urlObj)
   return urlObj;
 }
 
@@ -137,7 +136,7 @@ app.get('/u/:id', (req, res) => {
 // create new url
 app.post('/urls', (req, res) => {
   const cookieId = req.cookies['user_id']
-  if (!req.cookies['user_id']) {
+  if (!cookieId) {
     return res.send('Cannot shorten URL because you are not logged in. If you don"t have an account, please create one.')
   }
   const newId = generateRandomString();
@@ -148,15 +147,36 @@ app.post('/urls', (req, res) => {
 // edit the url
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
+  const cookieId = req.cookies['user_id'];
+
   if (!urlDatabase[id].longURL) {
     return res.send('Error! Cannot edit a url if it does not exist!')
   }
+  if (!cookieId) {
+    return res.send('You do not have permission to edit. Please Log in.')
+  }
+  if (urlDatabase[id].userID !== cookieId) {
+    return res.send('You do not own this URL. Cannot edit something that you do not own.')
+  }
+
   urlDatabase[id].longURL = req.body.longURL;
   res.redirect('/urls');
 })
 
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
+  const cookieId = req.cookies['user_id']
+
+  if (!urlDatabase[id]) {
+    return res.send('The url you are trying to delete does not exist')
+  }
+  if (!cookieId) {
+    return res.send('You do not have permission to delete. Please Log in.')
+  }
+  if (urlDatabase[id].userID !== cookieId) {
+    return res.send('You do not own this URL. Cannot delete something that you do not own.')
+  }
+
   delete urlDatabase[id];
   res.redirect('/urls');
 })
@@ -177,7 +197,7 @@ app.post('/login', (req, res) => {
   if (foundUser.password !== password) {
     return res.status(403).send('The password you entered did not match')
   }
-  console.log('foundUser.id is ', foundUser.id)
+
   res.cookie('user_id', foundUser.id)
   res.redirect('/urls');
 })
@@ -218,9 +238,8 @@ app.post('/register', (req, res) => {
     email: email,
     password: password
   }
-
   users[id] = newUser;
-  console.log(users)
+
   res.cookie('user_id', id);
   res.redirect('/urls');
 })

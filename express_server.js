@@ -97,14 +97,29 @@ app.post('/urls/:id/delete', (req, res) => {
   res.redirect('/urls');
 })
 
-// username
 app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // if email or password not sent
+  if (!email || !password) {
+    return res.status(400).send('Please enter an email and password')
+  }
+
+  const foundUser = getUserByEmail(users, email);
+  if (!foundUser) {
+    return res.status(403).send('An account with that email does not exist')
+  }
+  if (foundUser.password !== password) {
+    return res.status(403).send('The password you entered did not match')
+  }
+  console.log('foundUser.id is ', foundUser.id)
+  res.cookie('user_id', foundUser.id)
   res.redirect('/urls');
 })
 
-//username
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  res.clearCookie('user_id');
   res.redirect('/urls');
 })
 
@@ -141,7 +156,7 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  
+
   res.render('login');
 })
 
@@ -152,6 +167,7 @@ const getUserByEmail = function(users, email) {
       return user
     }
   }
+  return null
 }
 
 app.listen(PORT, () => {

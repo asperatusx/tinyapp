@@ -140,6 +140,11 @@ app.post('/register', (req, res) => {
   res.redirect('/urls');
 })
 
+app.get('/login', (req, res) => {
+  
+  res.render('login');
+})
+
 const getUserByEmail = function(users, email) {
   for (userId in users) {
     const user = users[userId];

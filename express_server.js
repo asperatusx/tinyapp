@@ -1,24 +1,14 @@
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const bcrypt = require("bcryptjs");
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080; //default 8080
 
-// const urlDatabase = {
-//   b2xVn2: 'http://www.lighthouselabs.ca',
-//   "9sm5xK": "http://www.google.com",
-// }
 
-// const urlDatabase = {
-//   b2xVn2: {
-//     longURL: 'http://www.lighthouselabs.ca',
-//     userID: "b2xVn2"
-//   },
-//   "9sm5xK": {
-//     longURL: 'http://www.google.com',
-//     userID: "9sm5xK"
-//   },
-// }
+const password = "purple-monkey-dinosaur"; // found in the req.body object
+const hashedPassword = bcrypt.hashSync(password, 10);
+
 
 const urlDatabase = {
   b6UTxQ: {
@@ -184,17 +174,18 @@ app.post('/urls/:id/delete', (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-
+  const foundUser = getUserByEmail(users, email);
   // if email or password not sent
   if (!email || !password) {
     return res.status(400).send('Please enter an email and password')
   }
 
-  const foundUser = getUserByEmail(users, email);
+  const isPassword = bcrypt.compareSync(password, foundUser.password);
+ 
   if (!foundUser) {
     return res.status(403).send('An account with that email does not exist')
   }
-  if (foundUser.password !== password) {
+  if (!isPassword) {
     return res.status(403).send('The password you entered did not match')
   }
 
@@ -232,11 +223,12 @@ app.post('/register', (req, res) => {
   const foundUser = getUserByEmail(users, email);
   if (foundUser) return res.status(400).send('Email already in use. Please use another.')
 
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const id = generateRandomString();
   const newUser = {
     id: id,
     email: email,
-    password: password
+    password: hashedPassword
   }
   users[id] = newUser;
 
@@ -245,11 +237,13 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+  const cookieId = req.cookies['user_id'];
+  const user = users[cookieId];
+  
   if (req.cookies['user_id']) {
     return res.redirect('/urls')
   }
-  const cookieId = req.cookies['user_id'];
-  const user = users[cookieId];
+  
   const templateVars = {user: user }
   res.render('login', templateVars);
 })

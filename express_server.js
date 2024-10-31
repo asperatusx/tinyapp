@@ -50,7 +50,7 @@ app.get('/urls', (req, res) => {
   res.render('urls_index', templateVars);
 })
 
-// Go to create new URL page   USERNAME
+// Go to create new URL page 
 app.get('/urls/new', (req, res) => {
   const cookieId = req.cookies['user_id'];
   const user = users[cookieId];
@@ -120,12 +120,15 @@ app.post('/login', (req, res) => {
 
 app.post('/logout', (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 })
 
 // register user
 app.get('/register', (req, res) => {
-  res.render('register');
+  const cookieId = req.cookies['user_id'];
+  const user = users[cookieId];
+  const templateVars = {user: user }
+  res.render('register', templateVars);
 })
 
 app.post('/register', (req, res) => {
@@ -156,8 +159,10 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-
-  res.render('login');
+  const cookieId = req.cookies['user_id'];
+  const user = users[cookieId];
+  const templateVars = {user: user }
+  res.render('login', templateVars);
 })
 
 const getUserByEmail = function(users, email) {

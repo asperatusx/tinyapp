@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+    integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
+  <title>TinyApp</title>
 </head>
-<body>
-  <div>
-    <h1>Register!</h1>
-  </div>
-  <form action="/register" method="POST">
-    <label for="email">Enter an Email: </label>
-    <input type="email" name="email">
-    <label for="password">Enter a Password: </label>
-    <input type="password" name="password">
-    <button type="submit">Register</button>
-  </form>
-</body>
+<%- include('partials/_header') %>
+  <body>
+    <div>
+      <h1>Create Account</h1>
+    </div>
+    <form action="/register" method="POST">
+      <label for="email">Enter an Email: </label>
+      <input type="email" name="email">
+      <label for="password">Enter a Password: </label>
+      <input type="password" name="password">
+      <button type="submit">Register</button>
+    </form>
+  </body>
 </html>

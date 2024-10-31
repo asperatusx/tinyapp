@@ -76,6 +76,10 @@ app.get('/urls/:id', (req, res) => {
 
 app.get('/u/:id', (req, res) => {
   const id = req.params.id;
+  console.log('urlDatabase[id] is: ', urlDatabase[id])
+  if (!urlDatabase[id]) {
+    return res.send('Error! This shorthand URL does not exist!')
+  }
   const longURL = urlDatabase[id];
   res.redirect(longURL);
 })
@@ -93,6 +97,9 @@ app.post('/urls', (req, res) => {
 // edit the url
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
+  if (!urlDatabase[id]) {
+    return res.send('Error! Cannot edit a url if it does not exist!')
+  }
   urlDatabase[id] = req.body.longURL;
   res.redirect('/urls');
 })

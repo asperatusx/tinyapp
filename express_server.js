@@ -4,10 +4,33 @@ const morgan = require('morgan');
 const app = express();
 const PORT = 8080; //default 8080
 
+// const urlDatabase = {
+//   b2xVn2: 'http://www.lighthouselabs.ca',
+//   "9sm5xK": "http://www.google.com",
+// }
+
+// const urlDatabase = {
+//   b2xVn2: {
+//     longURL: 'http://www.lighthouselabs.ca',
+//     userID: "b2xVn2"
+//   },
+//   "9sm5xK": {
+//     longURL: 'http://www.google.com',
+//     userID: "9sm5xK"
+//   },
+// }
+
 const urlDatabase = {
-  b2xVn2: 'http://www.lighthouselabs.ca',
-  "9sm5xK": "http://www.google.com",
-}
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
+};
+
 
 const users = {
   userRandomID: {
@@ -68,7 +91,7 @@ app.get('/urls/:id', (req, res) => {
   
   const templateVars = {
     id: req.params.id,
-    longURL: urlDatabase[req.params.id],
+    longURL: urlDatabase[req.params.id].longURL,
     user: user
   }
   res.render('urls_show', templateVars);
@@ -76,11 +99,10 @@ app.get('/urls/:id', (req, res) => {
 
 app.get('/u/:id', (req, res) => {
   const id = req.params.id;
-  console.log('urlDatabase[id] is: ', urlDatabase[id])
-  if (!urlDatabase[id]) {
+  if (!urlDatabase[id].longURL) {
     return res.send('Error! This shorthand URL does not exist!')
   }
-  const longURL = urlDatabase[id];
+  const longURL = urlDatabase[id].longURL;
   res.redirect(longURL);
 })
 
@@ -90,17 +112,17 @@ app.post('/urls', (req, res) => {
     return res.send('Cannot shorten URL because you are not logged in. If you don"t have an account, please create one.')
   }
   const newId = generateRandomString();
-  urlDatabase[newId] = req.body.longURL;
+  urlDatabase[newId] = {longURL: req.body.longURL};
   res.redirect(`/urls/${newId}`);
 })
 
 // edit the url
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
-  if (!urlDatabase[id]) {
+  if (!urlDatabase[id].longURL) {
     return res.send('Error! Cannot edit a url if it does not exist!')
   }
-  urlDatabase[id] = req.body.longURL;
+  urlDatabase[id].longURL = req.body.longURL;
   res.redirect('/urls');
 })
 

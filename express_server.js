@@ -1,13 +1,11 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const morgan = require('morgan');
 const app = express();
 const PORT = 8080; //default 8080
 
 
-const password = "purple-monkey-dinosaur"; // found in the req.body object
-const hashedPassword = bcrypt.hashSync(password, 10);
 
 
 const urlDatabase = {
@@ -21,12 +19,13 @@ const urlDatabase = {
   },
 };
 
+const tempPassword = bcrypt.hashSync('1234', 10);
 
 const users = {
   aJ48lW: {
     id: "aJ48lW",
     email: "a@a.com",
-    password: "1234",
+    password: tempPassword,
   },
   user2RandomID: {
     id: "user2RandomID",
@@ -35,10 +34,18 @@ const users = {
   },
 }
 
+
+
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'whatever',
+  keys: ['abc123'],
+
+  // Cookie Options
+  // maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 function generateRandomString() {
   const randomNum = Math.random().toString(36).substring(2, 8);
@@ -61,10 +68,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/urls', (req, res) => {
-  const cookieId = req.cookies['user_id']
+  const cookieId = req.session.userID
   const user = users[cookieId]
 
-  if (!req.cookies['user_id']) {
+  if (!req.session.userID) {
     return res.send('Login to view your URLs. If you do not have an account, create one.')
   }
 
@@ -81,7 +88,7 @@ app.get('/urls', (req, res) => {
 
 // Go to create new URL page 
 app.get('/urls/new', (req, res) => {
-  const cookieId = req.cookies['user_id'];
+  const cookieId = req.session.userID;
   const user = users[cookieId];
   const templateVars = {user: user }
   
@@ -94,7 +101,7 @@ app.get('/urls/new', (req, res) => {
 
 // Go to specific URL in database
 app.get('/urls/:id', (req, res) => {
-  const cookieId = req.cookies['user_id']
+  const cookieId = req.session.userID
   const user = users[cookieId];
   const paramURL = req.params.id;
 
@@ -119,13 +126,17 @@ app.get('/u/:id', (req, res) => {
   if (!urlDatabase[id].longURL) {
     return res.send('Error! This shorthand URL does not exist!')
   }
-  const longURL = urlDatabase[id].longURL;
+  let longURL = urlDatabase[id].longURL;
+  const httpString = 'https://www.';
+  if (!longURL.includes(httpString)) {
+    longURL = httpString + longURL;
+  }
   res.redirect(longURL);
 })
 
 // create new url
 app.post('/urls', (req, res) => {
-  const cookieId = req.cookies['user_id']
+  const cookieId = req.session.userID
   if (!cookieId) {
     return res.send('Cannot shorten URL because you are not logged in. If you don"t have an account, please create one.')
   }
@@ -137,7 +148,7 @@ app.post('/urls', (req, res) => {
 // edit the url
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
-  const cookieId = req.cookies['user_id'];
+  const cookieId = req.session.userID;
 
   if (!urlDatabase[id].longURL) {
     return res.send('Error! Cannot edit a url if it does not exist!')
@@ -155,7 +166,7 @@ app.post('/urls/:id', (req, res) => {
 
 app.post('/urls/:id/delete', (req, res) => {
   const id = req.params.id;
-  const cookieId = req.cookies['user_id']
+  const cookieId = req.session.userID
 
   if (!urlDatabase[id]) {
     return res.send('The url you are trying to delete does not exist')
@@ -189,21 +200,21 @@ app.post('/login', (req, res) => {
     return res.status(403).send('The password you entered did not match')
   }
 
-  res.cookie('user_id', foundUser.id)
+  req.session.userID = foundUser.id;
   res.redirect('/urls');
 })
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/login');
 })
 
 // register user
 app.get('/register', (req, res) => {
-  if (req.cookies['user_id']) {
+  if (req.session.userID) {
     return res.redirect('/urls')
   }
-  const cookieId = req.cookies['user_id'];
+  const cookieId = req.session.userID;
   const user = users[cookieId];
   const templateVars = {user: user }
   res.render('register', templateVars);
@@ -232,15 +243,15 @@ app.post('/register', (req, res) => {
   }
   users[id] = newUser;
 
-  res.cookie('user_id', id);
+  req.session.userID = id;
   res.redirect('/urls');
 })
 
 app.get('/login', (req, res) => {
-  const cookieId = req.cookies['user_id'];
+  const cookieId = req.session.userID;
   const user = users[cookieId];
   
-  if (req.cookies['user_id']) {
+  if (req.session.userID) {
     return res.redirect('/urls')
   }
   

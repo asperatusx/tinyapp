@@ -2,6 +2,7 @@ const express = require('express');
 const cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const morgan = require('morgan');
+const { getUserByEmail } = require('./helpers');
 const app = express();
 const PORT = 8080; //default 8080
 
@@ -123,9 +124,11 @@ app.get('/urls/:id', (req, res) => {
 
 app.get('/u/:id', (req, res) => {
   const id = req.params.id;
-  if (!urlDatabase[id].longURL) {
+
+  if (!urlDatabase[id] || !urlDatabase[id].longURL) {
     return res.send('Error! This shorthand URL does not exist!')
   }
+
   let longURL = urlDatabase[id].longURL;
   const httpString = 'https://www.';
   if (!longURL.includes(httpString)) {
@@ -258,16 +261,6 @@ app.get('/login', (req, res) => {
   const templateVars = {user: user }
   res.render('login', templateVars);
 })
-
-const getUserByEmail = function(users, email) {
-  for (userId in users) {
-    const user = users[userId];
-    if (user.email === email) {
-      return user
-    }
-  }
-  return null
-}
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);

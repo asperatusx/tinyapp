@@ -33,8 +33,8 @@ const urlDatabase = {
 
 
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "a@a.com",
     password: "1234",
   },
@@ -55,6 +55,17 @@ function generateRandomString() {
   return randomNum;
 }
 
+function urlsForUser(id) {
+  const urlObj = {};
+  for (let dataId in urlDatabase) {
+    if (urlDatabase[dataId].userID === id) {
+      urlObj[dataId] = {longURL: urlDatabase[dataId].longURL};
+    }
+  }
+  console.log('urlObj is -----------', urlObj)
+  return urlObj;
+}
+
 
 app.get('/', (req, res) => {
   res.end('Hello!');
@@ -63,10 +74,16 @@ app.get('/', (req, res) => {
 app.get('/urls', (req, res) => {
   const cookieId = req.cookies['user_id']
   const user = users[cookieId]
+
+  if (!req.cookies['user_id']) {
+    return res.send('Login to view your URLs. If you do not have an account, create one.')
+  }
+
+  const userURLs = urlsForUser(cookieId);
   console.log('result of cookieId: ', req.cookies)
 
   const templateVars = {
-    urls: urlDatabase,
+    urls: userURLs,
     user: user
   };
   console.log('result of templateVars:', templateVars);
@@ -75,12 +92,14 @@ app.get('/urls', (req, res) => {
 
 // Go to create new URL page 
 app.get('/urls/new', (req, res) => {
-  if (!req.cookies['user_id']) {
-    return res.redirect('/login')
-  }
   const cookieId = req.cookies['user_id'];
   const user = users[cookieId];
   const templateVars = {user: user }
+  
+  if (!cookieId) {
+    return res.redirect('/login')
+  }
+  
   res.render('urls_new', templateVars);
 })
 
@@ -88,9 +107,18 @@ app.get('/urls/new', (req, res) => {
 app.get('/urls/:id', (req, res) => {
   const cookieId = req.cookies['user_id']
   const user = users[cookieId];
+  const paramURL = req.params.id;
+
+  if (!cookieId) {
+    return res.send('You do not have access to URL. Please Log in.')
+  }
+  
+  if (cookieId !== urlDatabase[paramURL].userID) {
+    return res.send('This URL does not belong to you. You do not have access.')
+  }
   
   const templateVars = {
-    id: req.params.id,
+    id: paramURL,
     longURL: urlDatabase[req.params.id].longURL,
     user: user
   }
@@ -108,11 +136,12 @@ app.get('/u/:id', (req, res) => {
 
 // create new url
 app.post('/urls', (req, res) => {
+  const cookieId = req.cookies['user_id']
   if (!req.cookies['user_id']) {
     return res.send('Cannot shorten URL because you are not logged in. If you don"t have an account, please create one.')
   }
   const newId = generateRandomString();
-  urlDatabase[newId] = {longURL: req.body.longURL};
+  urlDatabase[newId] = {longURL: req.body.longURL, userID: cookieId};
   res.redirect(`/urls/${newId}`);
 })
 

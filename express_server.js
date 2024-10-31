@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 app.get('/urls', (req, res) => {
   const cookieId = req.cookies['user_id']
   const user = users[cookieId]
-  console.log('result of cookieId: ', cookieId)
+  console.log('result of cookieId: ', req.cookies)
 
   const templateVars = {
     urls: urlDatabase,
@@ -52,6 +52,9 @@ app.get('/urls', (req, res) => {
 
 // Go to create new URL page 
 app.get('/urls/new', (req, res) => {
+  if (!req.cookies['user_id']) {
+    return res.redirect('/login')
+  }
   const cookieId = req.cookies['user_id'];
   const user = users[cookieId];
   const templateVars = {user: user }
@@ -79,6 +82,9 @@ app.get('/u/:id', (req, res) => {
 
 // create new url
 app.post('/urls', (req, res) => {
+  if (!req.cookies['user_id']) {
+    return res.send('Cannot shorten URL because you are not logged in. If you don"t have an account, please create one.')
+  }
   const newId = generateRandomString();
   urlDatabase[newId] = req.body.longURL;
   res.redirect(`/urls/${newId}`);
@@ -125,6 +131,9 @@ app.post('/logout', (req, res) => {
 
 // register user
 app.get('/register', (req, res) => {
+  if (req.cookies['user_id']) {
+    return res.redirect('/urls')
+  }
   const cookieId = req.cookies['user_id'];
   const user = users[cookieId];
   const templateVars = {user: user }
@@ -159,6 +168,9 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+  if (req.cookies['user_id']) {
+    return res.redirect('/urls')
+  }
   const cookieId = req.cookies['user_id'];
   const user = users[cookieId];
   const templateVars = {user: user }

@@ -1,4 +1,5 @@
 const express = require('express');
+const methodOverride = require('method-override');
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 const morgan = require('morgan');
@@ -38,6 +39,7 @@ const users = {
 };
 
 app.set('view engine', 'ejs');
+app.use(methodOverride('_method'))
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(cookieSession({
@@ -158,7 +160,7 @@ app.post('/urls/:id', (req, res) => {
 });
 
 // Delete a URL
-app.post('/urls/:id/delete', (req, res) => {
+app.delete('/urls/:id', (req, res) => {
   const id = req.params.id;
   const cookieId = req.session.userID;
 

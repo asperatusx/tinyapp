@@ -52,7 +52,10 @@ function generateRandomString() {
 
 
 app.get('/', (req, res) => {
-  res.end('Hello!');
+  if (req.session.userID) {
+    return res.redirect('/urls')
+  }
+  res.redirect('/login')
 });
 
 app.get('/urls', (req, res) => {
@@ -176,6 +179,7 @@ app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
   const foundUser = getUserByEmail(users, email);
+
   // if email or password not sent
   if (!email || !password) {
     return res.status(400).send('Please enter an email and password')

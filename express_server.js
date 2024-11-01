@@ -141,7 +141,7 @@ app.post('/urls', (req, res) => {
 });
 
 // Edit the existing URL
-app.post('/urls/:id', (req, res) => {
+app.put('/urls/:id', (req, res) => {
   const id = req.params.id;
   const cookieId = req.session.userID;
 

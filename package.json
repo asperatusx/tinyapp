@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node express_server.js",
+    "test": "mocha",
     "start": "nodemon -e ejs -L express_server.js"
   },
   "repository": {
@@ -22,10 +22,12 @@
     "bcryptjs": "^2.4.3",
     "cookie-session": "^2.1.0",
     "ejs": "^3.1.10",
-    "express": "^4.21.1",
-    "morgan": "^1.10.0"
+    "express": "^4.21.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
+    "chai": "^4.3.1",
+    "mocha": "^10.8.2",
+    "nodemon": "^3.1.7",
+    "morgan": "^1.10.0"
   }
 }

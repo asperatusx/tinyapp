@@ -16,7 +16,7 @@ const testUsers = {
 };
 
 describe('getUserByEmail', () => {
-  it('should return a user with the correct email', () => {
+  it('should return a user object when provided with an email that exists in the database', () => {
     const user = getUserByEmail(testUsers, 'user@example.com');
     const expectedUserID = 'userRandomID';
     assert.deepEqual(user, testUsers[expectedUserID]);

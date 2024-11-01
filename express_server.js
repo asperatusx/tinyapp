@@ -193,12 +193,12 @@ app.post('/login', (req, res) => {
   if (!email || !password) {
     return res.status(400).send('Please enter an email and password')
   }
-
-  const isPassword = bcrypt.compareSync(password, foundUser.password);
- 
   if (!foundUser) {
     return res.status(403).send('An account with that email does not exist')
   }
+
+  const isPassword = bcrypt.compareSync(password, foundUser.password);
+ 
   if (!isPassword) {
     return res.status(403).send('The password you entered did not match')
   }

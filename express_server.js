@@ -2,12 +2,9 @@ const express = require('express');
 const cookieSession = require('cookie-session')
 const bcrypt = require("bcryptjs");
 const morgan = require('morgan');
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, urlsForUser } = require('./helpers');
 const app = express();
 const PORT = 8080; //default 8080
-
-
-
 
 const urlDatabase = {
   b6UTxQ: {
@@ -53,16 +50,6 @@ function generateRandomString() {
   return randomNum;
 }
 
-function urlsForUser(id) {
-  const urlObj = {};
-  for (let dataId in urlDatabase) {
-    if (urlDatabase[dataId].userID === id) {
-      urlObj[dataId] = {longURL: urlDatabase[dataId].longURL};
-    }
-  }
-  return urlObj;
-}
-
 
 app.get('/', (req, res) => {
   res.end('Hello!');
@@ -76,7 +63,7 @@ app.get('/urls', (req, res) => {
     return res.send('Login to view your URLs. If you do not have an account, create one.')
   }
 
-  const userURLs = urlsForUser(cookieId);
+  const userURLs = urlsForUser(cookieId, urlDatabase);
   console.log('result of cookieId: ', req.cookies)
 
   const templateVars = {

@@ -8,4 +8,15 @@ const getUserByEmail = function(users, email) {
   return undefined
 }
 
-module.exports = { getUserByEmail };
+function urlsForUser(userId, urlDatabase) {
+  const urlObj = {};
+  for (let dataId in urlDatabase) {
+    if (urlDatabase[dataId].userID === userId) {
+      urlObj[dataId] = {longURL: urlDatabase[dataId].longURL};
+    }
+  }
+  return urlObj;
+}
+
+module.exports = { getUserByEmail, urlsForUser };
+
